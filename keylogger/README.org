@@ -1,0 +1,1 @@
+*keylogger* is a simple key logger that reads keyboard events from the linux kernel and echos only ASCII characters

