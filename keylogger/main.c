@@ -46,13 +46,13 @@ void log_time_and_signal(int sig)
 void on_kill(int sig)
 {
     if (log_file != NULL) {
-        log_time_and_signal(sig);
         fflush(log_file);
         fclose(log_file);
     }
     if (fd != -1) {
         close(fd);
     }
+    log_time_and_signal(sig);
     exit(0);
 }
 
