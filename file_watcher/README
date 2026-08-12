@@ -14,4 +14,4 @@ Supported Events:
 
 NOTE:
 - the file watcher is not recursive, if the watched directory
-   have nested directories you to add them manually
+   have nested directories you have to add them manually
