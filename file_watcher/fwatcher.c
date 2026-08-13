@@ -13,9 +13,14 @@ struct recent_event {
     char type[32];
 };
 
-static void recent_update(struct recent_event *re, const uint32_t mask,
-                          const uint32_t cookie, const size_t wd_idx,
-                          const char name[], const char type[])
+static void recent_update(
+    struct recent_event *re,
+    const uint32_t mask,
+    const uint32_t cookie,
+    const size_t wd_idx,
+    const char name[],
+    const char type[]
+)
 {
     re->mask = mask;
     re->cookie = cookie;
@@ -48,10 +53,12 @@ int main(int argc, char *argv[])
     size_t size;
 
     for (size_t i = 0; i < wdirs; i++) {
-        wd[i] = inotify_add_watch(fd, argv[i + 1],
-                                  IN_CREATE | IN_DELETE | IN_CLOSE_WRITE |
-                                      IN_MOVE_SELF | IN_MOVED_FROM |
-                                      IN_MOVED_TO | IN_DELETE_SELF);
+        wd[i] = inotify_add_watch(
+            fd,
+            argv[i + 1],
+            IN_CREATE | IN_DELETE | IN_CLOSE_WRITE | IN_MOVE_SELF |
+                IN_MOVED_FROM | IN_MOVED_TO | IN_DELETE_SELF
+        );
 
         if (wd[i] < 0) {
             perror("Error");
@@ -92,16 +99,19 @@ int main(int argc, char *argv[])
                 (event->mask & IN_ISDIR) ? "[DIRECTORY]" : "[FILE]";
 
             if (event->mask & IN_CREATE)
-                printf("%s/%s is created %s\n", argv[wd_idx], event->name,
-                       type);
+                printf(
+                    "%s/%s is created %s\n", argv[wd_idx], event->name, type
+                );
 
             if (event->mask & IN_CLOSE_WRITE)
-                printf("%s/%s is touched %s\n", argv[wd_idx], event->name,
-                       type);
+                printf(
+                    "%s/%s is touched %s\n", argv[wd_idx], event->name, type
+                );
 
             if (event->mask & IN_DELETE)
-                printf("%s/%s is deleted %s\n", argv[wd_idx], event->name,
-                       type);
+                printf(
+                    "%s/%s is deleted %s\n", argv[wd_idx], event->name, type
+                );
 
             if (event->mask & IN_DELETE_SELF) {
                 printf("WATCHED DIRECTORY IS DELETED\n");
@@ -110,34 +120,61 @@ int main(int argc, char *argv[])
             }
 
             if (event->mask & IN_MOVED_FROM) {
-                recent_update(&recent, event->mask, event->cookie, wd_idx,
-                              event->name, type);
+                recent_update(
+                    &recent,
+                    event->mask,
+                    event->cookie,
+                    wd_idx,
+                    event->name,
+                    type
+                );
             }
 
             if (event->mask & IN_MOVED_TO) {
                 if (event->cookie == recent.cookie) {
                     if (strcmp(argv[wd_idx], argv[recent.wd_idx]) == 0)
-                        printf("%s/%s is renamed to %s %s\n", argv[wd_idx],
-                               recent.name, event->name, type);
+                        printf(
+                            "%s/%s is renamed to %s %s\n",
+                            argv[wd_idx],
+                            recent.name,
+                            event->name,
+                            type
+                        );
                     else
-                        printf("%s/%s is moved to %s/%s\n", argv[recent.wd_idx],
-                               recent.name, argv[wd_idx], event->name);
+                        printf(
+                            "%s/%s is moved to %s/%s\n",
+                            argv[recent.wd_idx],
+                            recent.name,
+                            argv[wd_idx],
+                            event->name
+                        );
                 } else
-                    printf("%s is moved to (%s) from unwatched directory %s\n",
-                           event->name, argv[wd_idx], type);
+                    printf(
+                        "%s is moved to (%s) from unwatched directory %s\n",
+                        event->name,
+                        argv[wd_idx],
+                        type
+                    );
 
                 recent.cookie = 0;
             }
 
             if (event->mask & IN_MOVE_SELF)
-                printf("The watched directory (%s) itself was moved %s\n",
-                       event->name, type);
+                printf(
+                    "The watched directory (%s) itself was moved %s\n",
+                    event->name,
+                    type
+                );
         }
 
         if (recent.cookie > 0) {
-            printf("%s/%s is moved outside watched directory "
-                   "%s\n",
-                   argv[wd_idx], recent.name, recent.type);
+            printf(
+                "%s/%s is moved outside watched directory "
+                "%s\n",
+                argv[wd_idx],
+                recent.name,
+                recent.type
+            );
         }
     }
 
