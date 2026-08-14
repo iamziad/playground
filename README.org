@@ -1,6 +1,6 @@
 
 * Index
 
-[[file:todo-console-app-in-c/][todo-cli]]      - A simple todo app in c that uses plain files as the database.
-[[file:keylogger/][key-logger]]    - A key logger that reads input events from the Linux kernel and logs it in stdout and file.
-[[file:file_watcher/][file-watcher]]  - A file watcher that listens on the Linux kernel filesystem events through the inotify API.
+- [[file:todo-console-app-in-c/][todo-cli]] - A simple todo app in c that uses plain files as the database.
+- [[file:keylogger/][key-logger]] - A key logger that reads input events from the Linux kernel and logs it in stdout and file.
+- [[file:file_watcher/][file-watcher]] - A file watcher that listens on the filesystem events through the =inotify= API.
